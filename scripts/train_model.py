@@ -16,7 +16,7 @@ import shutil
 
 import torch
 torch.backends.cudnn.enabled = True
-from torch.autograd import Variable
+
 import torch.nn.functional as F
 import numpy as np
 import h5py
@@ -209,11 +209,11 @@ def train_loop(args, train_loader, val_loader):
         for batch in train_loader:
             t += 1
             questions, _, feats, answers, programs, _ = batch
-            questions_var = Variable(questions.cuda())
-            feats_var = Variable(feats.cuda())
-            answers_var = Variable(answers.cuda())
+            questions_var = questions.cuda()
+            feats_var = feats.cuda()
+            answers_var = answers.cuda()
             if programs[0] is not None:
-                programs_var = Variable(programs.cuda())
+                programs_var = programs.cuda()
 
             reward = None
             if args.model_type == 'PG':
@@ -448,18 +448,22 @@ def check_accuracy(args, program_generator, execution_engine, baseline_model, lo
     num_correct, num_samples = 0, 0
     for batch in loader:
         questions, _, feats, answers, programs, _ = batch
-
-        questions_var = Variable(questions.cuda(), volatile=True)
-        feats_var = Variable(feats.cuda(), volatile=True)
-        answers_var = Variable(feats.cuda(), volatile=True)
+        with torch.no_grad():
+            questions_var = questions.cuda()
+        # questions_var = Variable(questions.cuda(), volatile=True)
+            feats_var = feats.cuda()
+            answers_var = feats.cuda()
         if programs[0] is not None:
-            programs_var = Variable(programs.cuda(), volatile=True)
+            with torch.no_grad():
+                programs_var = programs.cuda()
 
         scores = None # Use this for everything but PG
         if args.model_type == 'PG':
             vocab = utils.load_vocab(args.vocab_json)
             for i in range(questions.size(0)):
-                program_pred = program_generator.sample(Variable(questions[i:i+1].cuda(), volatile=True))
+                # program_pred = program_generator.sample(Variable(questions[i:i+1].cuda(), volatile=True))
+                with torch.no_grad():
+                    program_pred = program_generator.sample(questions[i:i+1].cuda())
                 program_pred_str = iep.preprocess.decode(program_pred, vocab['program_idx_to_token'])
                 program_str = iep.preprocess.decode(programs[i], vocab['program_idx_to_token'])
                 if program_pred_str == program_str:
