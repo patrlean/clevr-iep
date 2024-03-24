@@ -148,14 +148,14 @@ def clevr_collate(batch):
     transposed = list(zip(*batch))
     question_batch = default_collate(transposed[0])
     image_batch = transposed[1]
-		if any(img is not None for img in image_batch):
-			  image_batch = default_collate(image_batch)
-		feat_batch = transposed[2]
-		if any(f is not None for f in feat_batch):
-			  feat_batch = default_collate(feat_batch)
-		answer_batch = default_collate(transposed[3])
-		program_seq_batch = transposed[4]
-		if transposed[4][0] is not None:
-				program_seq_batch = default_collate(transposed[4])
-		program_struct_batch = transposed[5]
-		return [question_batch, image_batch, feat_batch, answer_batch, program_seq_batch, program_struct_batch]
+    if any(img is not None for img in image_batch):
+        image_batch = default_collate(image_batch)
+    feat_batch = transposed[2]
+    if any(f is not None for f in feat_batch):
+        feat_batch = default_collate(feat_batch)
+    answer_batch = default_collate(transposed[3])
+    program_seq_batch = transposed[4]
+    if transposed[4][0] is not None:
+        program_seq_batch = default_collate(transposed[4])
+    program_struct_batch = transposed[5]
+    return [question_batch, image_batch, feat_batch, answer_batch, program_seq_batch, program_struct_batch]
