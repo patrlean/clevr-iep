@@ -2,7 +2,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
+# from torch.autograd import Variable
 import torchvision.models
 
 from iep.models.layers import ResidualBlock, GlobalAveragePool, Flatten
@@ -223,7 +223,8 @@ class ModuleNet(nn.Module):
     
         if type(program) is list or type(program) is tuple:
             final_module_outputs = self._forward_modules_json(feats, program)
-        elif type(program) is Variable and program.dim() == 2:
+        # elif type(program) is Variable and program.dim() == 2:
+        elif isinstance(program, torch.Tensor) and program.dim() == 2:
             final_module_outputs = self._forward_modules_ints(feats, program)
         else:
             raise ValueError('Unrecognized program format')
