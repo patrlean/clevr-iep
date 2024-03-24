@@ -7,8 +7,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import sys
-sys.path.insert(0, os.path.abspath('.'))
 import os
+sys.path.insert(0, os.path.abspath('.'))
 
 import argparse
 import json
