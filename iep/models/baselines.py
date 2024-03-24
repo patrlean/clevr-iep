@@ -264,12 +264,12 @@ class CnnLstmSaModel(nn.Module):
     }
     self.classifier = build_mlp(**classifier_kwargs)
 
-  def forward(self, questions, feats):
-    N = questions.size(0)
-    assert N == feats.size(0)
-    q_feats = self.rnn(questions)
-    img_feats = self.cnn(feats)
-    cat_feats = torch.cat([q_feats, img_feats.view(N, -1)], 1)
-    scores = self.classifier(cat_feats)
-    return scores
+	  def forward(self, questions, feats):
+		    N = questions.size(0)
+		    assert N == feats.size(0)
+		    q_feats = self.rnn(questions)
+		    img_feats = self.cnn(feats)
+		    cat_feats = torch.cat([q_feats, img_feats.view(N, -1)], 1)
+		    scores = self.classifier(cat_feats)
+		    return scores
 
