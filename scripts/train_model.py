@@ -332,8 +332,7 @@ def get_program_generator(args):
             pg.expand_encoder_vocab(vocab['question_token_to_idx'])
             kwargs['encoder_vocab_size'] = len(vocab['question_token_to_idx'])
     else:
-        kwargs =        
-        {
+        kwargs = {
             'encoder_vocab_size': len(vocab['question_token_to_idx']),
             'decoder_vocab_size': len(vocab['program_token_to_idx']),
             'wordvec_dim': args.rnn_wordvec_dim,
