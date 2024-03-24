@@ -2,7 +2,7 @@
 import argparse, os, json
 import h5py
 import numpy as np
-import imageio.imread as imread
+import imageio
 # imread is removed in 1.2.0
 
 import cv2
@@ -84,7 +84,7 @@ def main(args):
         i0 = 0
         cur_batch = []
         for i, (path, idx) in enumerate(input_paths):
-            img = imread(path, mode='RGB')
+            img = imageio.imread(path, mode='RGB')
             img = cv2.resize(img, img_size, interpolation=cv2.INTER_CUBIC)
 #             img = imresize(img, img_size, interp='bicubic')
             img = img.transpose(2, 0, 1)[None]
