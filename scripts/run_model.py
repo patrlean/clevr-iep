@@ -4,6 +4,7 @@ import random
 import shutil
 import sys
 import os
+sys.path.insert(0, os.path.abspath('.'))
 
 import torch
 # from torch.autograd import Var iable
