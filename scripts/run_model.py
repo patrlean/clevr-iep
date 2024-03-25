@@ -127,7 +127,9 @@ def run_single_example(args, model):
     img = (img.astype(np.float32) / 255.0 - mean) / std
 
     # Use CNN to extract features for the image
-    img_var = torch.tensor(img, dtype=torch.float32).to(dtype).detach()
+    # img_var = torch.tensor(img, dtype=torch.float32).to(dtype).detach()
+    device = torch.device("cuda" if args.use_gpu == 1 else "cpu")
+    img_var = torch.tensor(img, dtype=torch.float32).to(device).detach()
 
     # img_var = Vari able(torch.FloatTensor(img).type(dtype), volatile=True)
     feats_var = cnn(img_var)
