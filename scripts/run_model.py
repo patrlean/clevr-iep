@@ -6,12 +6,14 @@ import sys
 import os
 
 import torch
-from torch.autograd import Variable
+# from torch.autograd import Var iable
 import torch.nn.functional as F
 import torchvision
 import numpy as np
 import h5py
-from scipy.misc import imread, imresize
+# from scipy.misc import im read, im resize
+import cv2
+import imageio
 
 import iep.utils as utils
 import iep.programs
@@ -115,15 +117,18 @@ def run_single_example(args, model):
 
     # Load and preprocess the image
     img_size = (args.image_height, args.image_width)
-    img = imread(args.image, mode='RGB')
-    img = imresize(img, img_size, interp='bicubic')
+    img = imageio.imread(args.image, mode='RGB')
+    img = cv2.resize(img, img_size, interpolation=cv2.INTER_CUBIC)
+    # img = im resize(img, img_size, interp='bicubic')
     img = img.transpose(2, 0, 1)[None]
     mean = np.array([0.485, 0.456, 0.406]).reshape(1, 3, 1, 1)
     std = np.array([0.229, 0.224, 0.224]).reshape(1, 3, 1, 1)
     img = (img.astype(np.float32) / 255.0 - mean) / std
 
     # Use CNN to extract features for the image
-    img_var = Variable(torch.FloatTensor(img).type(dtype), volatile=True)
+    img_var = torch.tensor(img, dtype=torch.float32).to(dtype).detach()
+
+    # img_var = Vari able(torch.FloatTensor(img).type(dtype), volatile=True)
     feats_var = cnn(img_var)
 
     # Tokenize the question
@@ -136,7 +141,9 @@ def run_single_example(args, model):
                                 allow_unk=True)
     question_encoded = torch.LongTensor(question_encoded).view(1, -1)
     question_encoded = question_encoded.type(dtype).long()
-    question_var = Variable(question_encoded, volatile=True)
+    # question_var = Varia ble(question_encoded, volatile=True)
+    question_var = question_encoded.detach()
+
 
     # Run the model
     print('Running the model\n')
@@ -215,9 +222,12 @@ def run_baseline_batch(args, model, loader, dtype):
     num_correct, num_samples = 0, 0
     for batch in loader:
         questions, images, feats, answers, programs, program_lists = batch
-
-        questions_var = Variable(questions.type(dtype).long(), volatile=True)
-        feats_var = Variable(feats.type(dtype), volatile=True)
+        
+        # questions_var = Vari able(questions.type(dtype).long(), volatile=True)
+        # feats_var = Varia ble(feats.type(dtype), volatile=True)
+        with torch.no_grad():
+            questions_var = questions.type(dtype).long()
+            feats_var = feats.type(dtype)
         scores = model(questions_var, feats_var)
         probs = F.softmax(scores)
 
@@ -252,9 +262,11 @@ def run_our_model_batch(args, program_generator, execution_engine, loader, dtype
     num_correct, num_samples = 0, 0
     for batch in loader:
         questions, images, feats, answers, programs, program_lists = batch
-
-        questions_var = Variable(questions.type(dtype).long(), volatile=True)
-        feats_var = Variable(feats.type(dtype), volatile=True)
+        with torch.no_grad():
+            questions_var = questions.type(dtype).long()
+            feats_var = feats.type(dtype)
+        # questions_var = Vari able(questions.type(dtype).long(), volatile=True)
+        # feats_var = Varia ble(feats.type(dtype), volatile=True)
 
         programs_pred = program_generator.reinforce_sample(
                                 questions_var,
