@@ -64,18 +64,15 @@ class Seq2Seq(nn.Module):
                     idx[i] = t
                     break
         idx = idx.type_as(x.data)
-        x[x.data == self.NULL] = replace
-        # return x, Vari able(idx)
+        x[x.data == self.NULL] = replace # return x, Vari able(idx)
         return x, idx
 
     def encoder(self, x):
         V_in, V_out, D, H, L, N, T_in, T_out = self.get_dims(x=x)
         x, idx = self.before_rnn(x)
-        embed = self.encoder_embed(x)
-        # h0 = Var iable(torch.zeros(L, N, H).type_as(embed.data))
-        # c0 = Var iable(torch.zeros(L, N, H).type_as(embed.data))
+        embed = self.encoder_embed(x) # h0 = Var iable(torch.zeros(L, N, H).type_as(embed.data))
         h0 = torch.zeros(L, N, H).type_as(embed.data)
-        c0 = torch.zeros(L, N, H).type_as(embed.data)
+        c0 = torch.zeros(L, N, H).type_as(embed.data) # c0 = Var iable(torch.zeros(L, N, H).type_as(embed.data))
 
         out, _ = self.encoder_rnn(embed, (h0, c0))
 
@@ -92,11 +89,9 @@ class Seq2Seq(nn.Module):
         encoded_repeat = encoded.view(N, 1, H).expand(N, T_out, H)
         rnn_input = torch.cat([encoded_repeat, y_embed], 2)
         if h0 is None:
-            h0 = torch.zeros(L, N, H).type_as(encoded.data)
-            # h0 = Vari able(torch.zeros(L, N, H).type_as(encoded.data))
-        if c0 is None:
-            # c0 = Variab le(torch.zeros(L, N, H).type_as(encoded.data))
-            c0 = torch.zeros(L, N, H).type_as(encoded.data)
+            h0 = torch.zeros(L, N, H).type_as(encoded.data)  # h0 = Vari able(torch.zeros(L, N, H).type_as(encoded.data))
+        if c0 is None:   
+            c0 = torch.zeros(L, N, H).type_as(encoded.data)  # c0 = Variab le(torch.zeros(L, N, H).type_as(encoded.data))
         rnn_output, (ht, ct) = self.decoder_rnn(rnn_input, (h0, c0))
 
         rnn_output_2d = rnn_output.contiguous().view(N * T_out, H)
@@ -120,12 +115,10 @@ class Seq2Seq(nn.Module):
         self.multinomial_outputs = None
         V_in, V_out, D, H, L, N, T_in, T_out = self.get_dims(y=y)
         mask = y.data != self.NULL
-        y_mask = torch.Tensor(N, T_out).fill_(0).type_as(mask)
-        # y_mask = Varia ble(torch.Tensor(N, T_out).fill_(0).type_as(mask))
+        y_mask = torch.Tensor(N, T_out).fill_(0).type_as(mask)  # y_mask = Varia ble(torch.Tensor(N, T_out).fill_(0).type_as(mask))
         y_mask[:, 1:] = mask[:, 1:]
         y_masked = y[y_mask]
-        out_mask = torch.Tensor(N, T_out).fill_(0).type_as(mask)
-        # out_mask = Varia ble(torch.Tensor(N, T_out).fill_(0).type_as(mask))
+        out_mask = torch.Tensor(N, T_out).fill_(0).type_as(mask)  # out_mask = Varia ble(torch.Tensor(N, T_out).fill_(0).type_as(mask))
         out_mask[:, :-1] = mask[:, 1:]
         out_mask = out_mask.view(N, T_out, 1).expand(N, T_out, V_out)
         out_masked = output_logprobs[out_mask].view(-1, V_out)
@@ -147,8 +140,7 @@ class Seq2Seq(nn.Module):
         y = [self.START]
         h0, c0 = None, None
         while True:
-            cur_y = torch.LongTensor([y[-1]]).type_as(x.data).view(1, 1)
-            # cur_y = Variab le(torch.LongTensor([y[-1]]).type_as(x.data).view(1, 1))
+            cur_y = torch.LongTensor([y[-1]]).type_as(x.data).view(1, 1)  # cur_y = Variab le(torch.LongTensor([y[-1]]).type_as(x.data).view(1, 1))
             logprobs, h0, c0 = self.decoder(encoded, cur_y, h0=h0, c0=c0)
             _, next_y = logprobs.data.max(2)
             y.append(next_y[0, 0, 0])
@@ -162,8 +154,7 @@ class Seq2Seq(nn.Module):
         y = torch.LongTensor(N, T).fill_(self.NULL)
         done = torch.ByteTensor(N).fill_(0)
         cur_input = x.data.new(N, 1).fill_(self.START)
-        print('cur_point.shape:',cur_input.shape)
-        # cur_input = Variab le(x.data.new(N, 1).fill_(self.START))
+        print('cur_point.shape:',cur_input.shape) # cur_input = Variab le(x.data.new(N, 1).fill_(self.START))
         h, c = None, None
         self.multinomial_outputs = []
         self.multinomial_probs = []
