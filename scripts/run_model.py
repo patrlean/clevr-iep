@@ -160,6 +160,7 @@ def run_single_example(args, model):
                                     question_var,
                                     temperature=args.temperature,
                                     argmax=(args.sample_argmax == 1))
+        print("predicted_program shape:", predicted_program.shape)
         scores = execution_engine(feats_var, predicted_program)
     else:
         model.type(dtype)
