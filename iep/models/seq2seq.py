@@ -162,6 +162,7 @@ class Seq2Seq(nn.Module):
         y = torch.LongTensor(N, T).fill_(self.NULL)
         done = torch.ByteTensor(N).fill_(0)
         cur_input = x.data.new(N, 1).fill_(self.START)
+        print('cur_point.shape:',cur_point.shape)
         # cur_input = Variab le(x.data.new(N, 1).fill_(self.START))
         h, c = None, None
         self.multinomial_outputs = []
