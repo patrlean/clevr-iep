@@ -42,7 +42,7 @@ class Seq2Seq(nn.Module):
         D = self.encoder_embed.embedding_dim
         H = self.encoder_rnn.hidden_size
         L = self.encoder_rnn.num_layers
-        print('y.size:',y.shape)
+        
         N = x.size(0) if x is not None else None
         N = y.size(0) if N is None and y is not None else N
         T_in = x.size(1) if x is not None else None
